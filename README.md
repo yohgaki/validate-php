@@ -150,6 +150,7 @@ $POST_spec = array(
         'name'    => $T['name'],
         'zip'     => $T['zip'],
         'addr'    => $T['addr'],
+        'groups'  => $T['groups'],
         'comment' => $T['comment'],
     ),
 );
