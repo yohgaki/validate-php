@@ -81,22 +81,7 @@ int php_validate_callback(PHP_VALIDATE_PARAM_DECL);
 #define VALIDATE_REGEXP                        10
 #define VALIDATE_REGEXP_OPTS                   {"default", "min", "max", "amin", "amax", "regexp"}
 #define VALIDATE_REGEXP_FLAGS                  {NULL}
-#define VALIDATE_URL                           11
-#define VALIDATE_URL_OPTS                      {"default", "min", "max", "amin", "amax"}
-#define VALIDATE_URL_FLAGS                     {"VALIDATE_URL_ALLOW_HTTPS_SCHEME", "VALIDATE_URL_ALLOW_HTTP_SCHEME", "VALIDATE_URL_ALLOW_ANY_SCHEME", "VALIDATE_URL_ALLOW_HOST", "VALIDATE_URL_ALLOW_PATH", "VALIDATE_URL_ALLOW_QUERY", "VALIDATE_URL_ALLOW_IDN"}
-#define VALIDATE_EMAIL                         12
-#define VALIDATE_EMAIL_OPTS                    {"default", "min", "max", "amin", "amax"}
-#define VALIDATE_EMAIL_FLAGS                   {"VALIDATE_EMAIL_ALLOW_UTF8"}
-#define VALIDATE_IP                            13
-#define VALIDATE_IP_OPTS                       {"default", "min", "max", "amin", "amax"}
-#define VALIDATE_IP_FLAGS                      {"VALIDATE_IP_IPV4", "VALIDATE_IP_IPV6", "VALIDATE_IP_ALLOW_RESERVED", "VALIDATE_IP_ALLOW_PRIVATE"}
-#define VALIDATE_MAC                           14
-#define VALIDATE_MAC_OPTS                      {"default", "min", "max", "amin", "amax", "separator"}
-#define VALIDATE_MAC_FLAGS                     {NULL}
-#define VALIDATE_DOMAIN                        15
-#define VALIDATE_DOMAIN_OPTS                   {"default", "min", "max", "amin", "amax"}
-#define VALIDATE_DOMAIN_FLAGS                  {NULL}
-#define VALIDATE_LAST                          16 /* Only for the max ID */
+#define VALIDATE_LAST                          11 /* Only for the max ID */
 
 
 /* VALIDATE_NULL flags */
@@ -141,21 +126,6 @@ int php_validate_callback(PHP_VALIDATE_PARAM_DECL);
    Encoding list could be too long. */
 #define VALIDATE_STRING_ENCODING_PASS          0
 #define VALIDATE_STRING_ENCODING_UTF8          1
-
-/* Complex string value flags */
-#define VALIDATE_URL_ALLOW_HTTPS_SCHEME        1 << 0
-#define VALIDATE_URL_ALLOW_HTTP_SCHEME         1 << 1
-#define VALIDATE_URL_ALLOW_ANY_SCHEME          1 << 2
-#define VALIDATE_URL_ALLOW_HOST                1 << 3
-#define VALIDATE_URL_ALLOW_PATH                1 << 4
-#define VALIDATE_URL_ALLOW_QUERY               1 << 5
-#define VALIDATE_URL_ALLOW_IDN                 1 << 6
-#define VALIDATE_DOMAIN_HOSTNAME               1 << 1  /* Must not be the same value to VALIDATE_URL_ALLOW_IDN */
-#define VALIDATE_IP_IPV4                       1 << 0
-#define VALIDATE_IP_IPV6                       1 << 1
-#define VALIDATE_IP_ALLOW_RESERVED             1 << 2
-#define VALIDATE_IP_ALLOW_PRIVATE              1 << 3
-#define VALIDATE_EMAIL_ALLOW_UTF8              1 << 0
 
 /* VALIDATE_ARRAY */
 /* VALIDATE_OBJECT */
@@ -203,11 +173,6 @@ static const validator_list_entry validator_list[] = {
 	{ "REGEXP",     VALIDATE_OBJECT,    php_validate_object,   VALIDATE_OBJECT_FLAGS,    VALIDATE_OBJECT_OPTS },
 	{ "CALLBACK",   VALIDATE_CALLBACK,  php_validate_callback, VALIDATE_CALLBACK_FLAGS,  VALIDATE_CALLBACK_OPTS },
 	{ "REGEXP",     VALIDATE_REGEXP,    php_validate_regexp,   VALIDATE_REGEXP_FLAGS,    VALIDATE_REGEXP_OPTS },
-	{ "URL",        VALIDATE_URL,       php_validate_url,      VALIDATE_URL_FLAGS,       VALIDATE_URL_OPTS },
-	{ "EMAIL",      VALIDATE_EMAIL,     php_validate_email,    VALIDATE_EMAIL_FLAGS,     VALIDATE_EMAIL_OPTS },
-	{ "IP",         VALIDATE_IP,        php_validate_ip,       VALIDATE_IP_FLAGS,        VALIDATE_IP_OPTS },
-	{ "MAC",        VALIDATE_MAC,       php_validate_mac,      VALIDATE_MAC_FLAGS,       VALIDATE_MAC_OPTS },
-	{ "DOMAIN",     VALIDATE_DOMAIN,    php_validate_domain,   VALIDATE_DOMAIN_FLAGS,    VALIDATE_DOMAIN_OPTS },
 };
 /* }}} */
 

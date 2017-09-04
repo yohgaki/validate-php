@@ -3,11 +3,14 @@
 'validate' module is a true input validator module.
 
 * White-list. Almost everything is explicitly allowed by users.
+* True validation. Most validator implementation lacks white list approach and 'strong' string validation by default.
 * Simple. Only one validation function, mixed valid(mixed $input, array $input_sepc)
 * Fast. Don't need to call number of PHP functions to validate $_GET/$_POST/$_COOKIE/etc.
 * Flexible. Users can validate almost all types of inputs.
-* True validation. Most validator implementation lacks white list approach and 'strong' string validation by default.
 
+Although 'Filter' module has validation filters, but it cannot handle strings well. For web apps, text is the most important input for security. 'Filter' module does not have enough feature.
+
+Validate module has validators for basic PHP types. For strings, you can use 'regexp' and 'callback' for complex validation. This allows any kinds of string validation by array of rules for a input.
 
 'validate' module is under development. Please report bugs or send suggestions. GitHub PR is appreciated!
 
