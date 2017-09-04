@@ -395,15 +395,18 @@ static int php_validate_hash_key(zend_string *key, zval *value, zend_long valida
 	ZVAL_STRINGL(&tmp, ZSTR_VAL(key), ZSTR_LEN(key));
 	if (flags & VALIDATE_FLAG_UTF8_KEY) {
 		if (php_validate_string(&tmp, VALIDATE_STRING_DISABLE_DEFAULT, NULL, 0) == FAILURE) {
+			zval_ptr_dtor(&tmp);
 			PHP_VALIDATE_RAISE_EXCEPTION("Invalid UTF-8 key found");
 			return FAILURE;
 		}
 	} else {
 		if (php_validate_string(&tmp, VALIDATE_FLAG_NONE, NULL, 0) == FAILURE) {
+			zval_ptr_dtor(&tmp);
 			PHP_VALIDATE_RAISE_EXCEPTION("Invalid key found");
 			return FAILURE;
 		}
 	}
+	zval_ptr_dtor(&tmp);
 	return SUCCESS;
 }
 /* }}} */
