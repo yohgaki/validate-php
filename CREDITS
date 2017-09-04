@@ -1,0 +1,4 @@
+Variable Validator
+Yasuo Ohgaki <yohgaki@ohgaki.net>/<yohgaki@php.net>
+
+Some validation logics are borrowed from filter module.

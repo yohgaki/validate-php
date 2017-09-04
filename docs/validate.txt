@@ -1,0 +1,399 @@
+Validate Module
+
+*** About ***
+Validate is PHP module for input validations.
+ - Simple, flexible and easy to use.
+ - Fast (Native C validators. No PHP function call overheads)
+
+
+*** Warning ***
+This module is under development.
+ - Basic features are implemented, but not all of them yet.
+ - String validator(VALIDATE_STRING) is mostly implemented
+   as well as other basic types(BOOL/INT/FLOAT/REGEXP/CALLBACK)
+
+ToDo
+ - Implement all validators, validation flags and options. Object, overflow, etc
+ - Implement valid_spec() fully and make error nicer.
+ - PHP references are not handled well.
+
+Comments, requests and bug report
+ - File issue on github
+ - @yohgaki on Twitter
+ - yohgaki@ohgaki.net by mail
+
+PR is appreciated!! Please abuse and report bugs.
+
+
+*** Basics ***
+Validation module is designed to perform strict input validations for
+$_GET/$_POST/$_COOKIE/$_FILES/etc. Users may use this module for
+functions/methods input validations as well.
+
+Whitelist approach is applied to its design. Users must explicitly
+specify allowed input data specifications(spec).  No data
+sanitization, No automatic spec is implemented except a few exceptions.
+(e.g. Default UTF-8 validation for string. Native type conversion for
+BOOL/INT/FLOAT)
+
+By default, it will raise "ValidException" as soon as it finds spec violation
+or broken spec.
+
+
+*** Input Data Handling ****
+Many developers misunderstand input data handling basics. In some
+cases even 'Security Specialists' misunderstand what the secure input
+handling is.
+
+Following is the key understanding for secure input data handling.
+
+There are only 3 types of inputs
+ 1. Valid input that program can process.
+ 2. Valid input, but user input mistake and program can handle them.
+ 3. Invalid input that such data should be sent from client by design.
+
+Validate module is designed to handles 3. Since invalid inputs should
+_never_ be processed by programs, validate module raise exception for
+them by default.
+
+Computer programs are _never_ designed to work properly with "invalid"
+inputs. Although filtering invalid inputs can achive "proper input
+handling" by removing/sanitizing offensive inputs, is this the best way to secure
+program?
+
+Filtering/sanitizing input is not the best way for reasons.
+ - Ignoring invalid inputs is ignoring attacks.
+ - Flitering/sanitizing is black listing. It's error prone.
+ - Whitelisting is preferred always.
+ - Programs should reject/report/prevent invalid input rather than
+   filtering/sanitizing.
+
+Leaving invalid inputs could cause countless unexpected results.
+
+For instance, many programs hevily rely on output sanitization. Intger
+database reroced ID like '<script>alert(1)</script>' can never be
+correct. Leaving behind such value might/could result in printing
+'&lt;script&gt;alert(1)&lt;/script&gt;' to browsers/etc. This isn't
+correct obviously.
+
+Another example is too large integer. Suppose your code validate input
+is 'integer' type, but no range. Your code may result in executing
+'SELECT * FROM tbl LIMIT 99999999999' which could cause serious
+performance issue. (DoS)
+
+Validate module is designed to prevent such attacks and/or unexpected
+behavior by unvalidated inputs.
+
+Conclusion: All inputs must be validated unless they are sent from
+systems/components that can be trusted. All data can never be trusted
+unless it is proven/validated.
+
+e.g. Sensor data database that only stores valid float values
+_always_. No attackers can _never_ touch the data with any methods
+such as MTIM/etc.
+
+
+
+*** Usage Example ***
+
+--- input_spec.php ---
+<?php
+$id_spec = [
+  VALIDATE_STRING,
+  VALIDATE_STRING_NUM,
+  [
+    'min' => 5,
+    'max' => 11,
+  ]
+];
+
+$usename_spec = [
+  VALIDATE_STRING,
+  VALIDATE_STRING_ALNUM,
+  [
+    'min' => 5,
+    'max' => 30,
+  ]
+];
+?>
+-----------------------
+
+--- index.php ---
+<?php
+require 'input_spec.php'; // Load input spec definitions
+
+$POST_validation_spec = [
+  VALIDATE_ARRAY,
+  VALIDATE_FLAG_NONE,
+  [ 'min' => 0, 'max' => 3 ],
+  [
+    'id' => $id_spec,
+    'username' => $username_spec,
+  ]
+];
+
+$GET_validation_spec = [
+  ....
+];
+
+$POST_validated = valid($_POST, $POST_validation_spec, $status, VALIDATE_OPT_DISABLE_EXCEPTION);
+$GET_validated  = valid($_GET, $GET_validation_spec, $status, VALIDATE_OPT_DISABLE_EXCEPTION);
+
+// If valid() fails, returns NULL.
+// Returned values contains validated values only.
+// e.g. $_POST['attacker_set_value'] etc will never be included.
+//      You can control if you accept such value by 'max' option of VALIDATE_ARRAY validator.
+?>
+------------------------
+
+
+
+*** Features ***
+Key features are:
+ - Default UTF-8 encoding validation.
+ - Whitelist, strict and safe default validation.
+ - Optimized for array data validation.
+ - Input/Output data will not be modified by default. e.g. No trim, unlike filter module.
+ - Standard array input validation specification. (Plain PHP array. Easy to write and reuse)
+ - Flexible validation by 'regexp' and 'callback' validator.
+ - Flexible validation definition by native PHP array.
+ - Nested spec array for flexibility (e.g. array(array(array()) )
+   and array of elements(e.g. some.php?arr[]=v1&arr[]=v2) and more.
+ - Exception based with optional error.
+
+List of Validators:
+ - <?php print_r(valid_list()); ?>
+ - This will print available 'flags' and 'options' for validators
+
+Note: Please use defined constants for valid(). It may change.
+ - <?php print_r(get_defined_constants(true)["validate"]); ?>
+
+
+
+*** Supported PHP Version ***
+Developed with master branch.
+It should work with PHP 7.0 and up.
+Report problems if it does not.
+
+
+*** Install ***
+Untar source somewhere. You need build tools to build PHP extension modules.
+
+$ cd php-validate
+$ phpize
+$ ./configure
+$ make
+$ make install   #(or sudo make install)
+
+Add following to php.ini
+
+extension=validate
+or
+extension=validate.so
+
+
+
+*** Basic Functions ***
+There is only one validation function.
+
+Validation:
+ - mixed valid(mixed $input, array $validation_specs, bool $status [, int $function_options])
+Return Value: Validated value(s). Values not defined in $validation_specs are excluded.
+
+
+Misc:
+ - string valid_id(string $name)
+Return Value:  Int Validator ID (Not much useful)
+
+ - array valid_list(void)
+Return Value:  Returns list of validators including supported 
+
+
+*** Validation Specification(Spec) Array Format ***
+Validation spec array is simple, but flexible enough for almost all inputs.
+
+$valid_spec format for single value (scalar):
+------------------------
+<?php
+$valid_spec = array(
+   <validator_id>, // int ID, use VALIDATE_STRING, VALIDATE_INT, etc
+   VALIDATE_FLAG_SOME | VALIDATE_FLAG_OTHER, // int bitmap
+   array(
+       "default" => "Some Value", // Default value for undefined/empty option
+       "min" => <int>,  // Minimum bytes.
+       "max" => <int>,  // Maximum byte.s
+       // callback/regex validators can specify "callback" function/"regex" string.
+       // e.g. "callback" => $func
+   )
+);
+?>
+------------------------
+
+You can specify multiple specs for a data to be validated by nested array.
+This is useful for performing complex validation for strings.
+
+Multiple specs for scalar:
+------------------------
+<?php
+$valid_spec =
+array(
+   array( // 1st spec
+      <int validator_id>,
+      VALIDATE_FLAG_SOME,
+      array(
+         "default" => <, // Default value for undefined/empty option
+         "min" => <int>,  // Minimum bytes
+         "max" => <int>,  // Maximum bytes
+         // callback/regex validators can specify "callback" function/"regex" string.
+         // e.g. "callback" => $func
+      )
+   ),
+   array( // 2nd spec
+      //... definition here ...
+   ),
+   array( // 3rd spec
+      //... definition here ...
+   ),
+);
+?>
+------------------------
+
+All specs are evaluated. If one of them fails, validation fails.
+
+
+ 
+Array input data validation is basically the same as scalar validation
+except it has array of scalar specs as 4th element option.
+
+$valid_spec format for array inputs:
+------------------------
+<?php
+$valid_spec =
+array(
+    VALIDATE_ARRAY,     // 1st is validator "ID"
+    VALIDATE_FLAG_NONE, // 2nd is validator "flags"
+    array(              // 3rd is validator "options"  
+       "min" => 3,  // Minimum elements in subject array
+       "max" => 10, // Maximum elements in subject array
+    ),
+    array( // 4th element of VALIDATE_ARRAY validator is elements spec definitions
+      // Basically the same as scalar input spec, but it has "key" or "index"
+      "foo" => array(
+          VALIDATE_STRING,
+          VALIDATE_STRING_DISABLE_DEFAULT | VALIDATE_STRING_ALLOW_LF,
+          array(
+             "min" => 10,
+             "max" => 300,
+          )
+      ),
+      "bar" => array(
+          VALIDATE_STRING,
+          VALIDATE_STRING_DISABLE_DEFAULT | VALIDATE_STRING_ALLOW_LF,
+          array(
+             "min" => 10,
+             "max" => 300,
+          )
+      ),
+     "other_key" => array(....),
+
+     "yet_another_key => array(....),
+
+     "multiple" => aray(array(..spec1..), array(..spec2..)),
+
+     1234 => array(....), // Numeric key is allowed.
+
+     "nested_array" => array(
+        VALIDATE_ARRAY,   // Nested array spec is processed recursively.
+        VALIDATE_FLAG_NONE,
+        array(
+           "min" => 3,
+           "max" => 10,
+        ),
+        array( ..spec1.., ..spec2..),
+     )
+  )
+);
+?>
+------------------------
+
+
+*** Example spec definition and code ***
+Please take a look at *.phpt files in the unit test directory.
+(i.e. ext/validate/tests/*.phpt)
+
+
+*** Real world usage hint ***
+Your application may have thousands of inputs for hundreds of URLs.
+However, types of inputs are much fewer than number of inputs.
+
+Array spec definition allows you to configure strict input validation
+easily. For example, you may have "id" query parameter which is always
+int type, "userid" query parameter which is always alpha numeric, and
+so on.
+
+File: input_type_specs.php
+------------------------
+<?php
+$input_specs = [
+   'id' => [
+      VALIDATE_INT,
+      VALIDATE_FLAG_UNDEFINED_TO_DEFAULT | VALIDATE_FLAG_EMPTY_TO_DEFAULT,
+      ['default' => 1000, 'min' => 1000, 'max' => PHP_INT_MAX]
+    ],
+    'userid' => [
+      VALIDATE_STRING,
+      VALIDATE_STRING_ALNUM,
+      ['min' => 6, 'max' => 64]
+    ],    
+    /* more input type specs blow */
+];
+?>
+------------------------
+
+Once you define input specs, then you can reuse the spec for any number of controllers.
+
+File: some_controller.php
+------------------------
+<?php
+/** Performing validation on a controller **/
+
+// Load input specs
+require('input_specs.php');
+
+// Validation spec for this controller.
+$GET_spec = [
+   [VALIDATE_ARRAY, VALIDATE_FLAG_NONE, ['min'=>8, 'max'=>10]],
+   'id'     => $input_specs['id'],
+   'userid' => $input_specs['userid']
+   /* more validation spec below */
+];
+
+// You may have other input specs for POST/COOKIE/FILES/ENV etc
+// You may aggregate even more. All specs may be checked by a
+// single valid() call as follows.
+
+$POST_sepc = [...];
+$COOKIE_spec = [...];
+
+// Invalid value raises exception. Simply handle "ValidException" for invalid inputs.
+try {
+   $validated_values =
+           valid(['get'=>$_GET, 'post'=>$_POST, 'cookie'=>$_COOKIE],
+           ['get'=>$GET_spec, 'post'=>$POST_spec, 'cookie'=>$COOKIE_spec],
+           $status);
+} catch Exception ($e) {
+   // Send warning to user who sent illegal input.
+   // Log invalid access.
+   // Protect app from the user/IP whennever it is possible.
+   // Make sure you never allow invalid(attacker) input to your app.
+   die();
+}
+
+/** Do controller work after validation **/
+?>
+------------------------
+
+To validate inputs strictly on server side, you needs client side validation
+and validation rule should match.
+
+Have fun!
