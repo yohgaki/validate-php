@@ -8,16 +8,31 @@
 * Fast. Don't need to call number of PHP functions to validate $_GET/$_POST/$_COOKIE/etc.
 * Flexible. Users can validate almost all types of inputs.
 
-Although 'Filter' module has validation filters, but it cannot handle strings well. For web apps, text is the most important input for security. 'Filter' module does not have enough feature.
+Although 'Filter' module has validation filters, but it cannot handle
+strings well. For web apps, text is the most important input for
+security. 'Filter' module does not have enough feature.
 
-Validate module has validators for basic PHP types. For strings, you can use 'regexp' and 'callback' for complex validation. This allows any kinds of string validation by array of rules for a input.
+'validate' module does not allow any chars have risks by default.  It
+accepts only alpha numeric and '_','-','.'. Use
+VALIDATE_STRING_DISABLE_DEFAULT to allow more chars and string is
+validated as valid UTF-8. It still does not allow any CNTRL chars.
+Use other flags to allow newlines, tab. Use string validator
+'encoding' option if you need to check binary size.
+i.e. array('encoding'=>VALIDATE_STRING_ENCODING_PASS).
 
-'validate' module is under development. Please report bugs or send suggestions. GitHub PR is appreciated!
+Validate module has validators for basic PHP types. For strings, you
+can use 'regexp' and 'callback' for complex validation. This allows
+any kinds of string validation by array of rules for a input.
+
+'validate' module is under development. Please report bugs or send
+suggestions. GitHub PR is appreciated!
 
 * @twitter - yohgaki
 * mail - yohgaki@ohgaki.net
 
-'validate' is licensed by PHP Lisense as written in code. It should work with PHP 7.0 and up.
+'validate' is licensed by PHP Lisense as written in code. It should
+work with PHP 7.0 and up.
+
 
 ## Secure Coding Basics
 
