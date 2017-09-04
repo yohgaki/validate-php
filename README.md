@@ -138,7 +138,7 @@ $T = array(
     */
 );
 
-// Input data validation spec
+// Input data validation spec - Users can nest arrays, too.
 $POST_spec = array(
     VALIDATE_ARRAY,
     VALIDATE_FLAG_NONE,
