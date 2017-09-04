@@ -91,7 +91,7 @@ $T = array(
         ),
         array( // Evaluated 2nd
             VALIDATE_CALLBACK, VALIDATE_FLAG_NONE,
-            array('min'=>10, 'max'=>1024, 'addr_validator'),
+            array('min'=>10, 'max'=>1024, 'callback'=>'addr_validator'),
         ),
     ),
     'groups' => array( // Array of ints
