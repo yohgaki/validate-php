@@ -21,7 +21,6 @@
 #ifndef VALIDATE_PRIVATE_H
 #define VALIDATE_PRIVATE_H
 
-
 #define PHP_VALIDATE_PARAM_DECL zval *value, zend_long flags, zval *option_array, zend_long func_opts
 #define PHP_VALIDATE_EMPTY_TO_DEFAULT_PARAMS value, flags, option_array, func_opts, validator_id
 

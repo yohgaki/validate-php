@@ -1,5 +1,10 @@
 # Validate - A Validator module for PHP7
 
+**There is PHP script version for protypting Validate PHP**. Please use PHP script version for now.
+
+* https://github.com/yohgaki/validate-php-scr
+
+
 'validate' module is a true input validator module.
 
 * White-list. Almost everything is explicitly allowed by users.

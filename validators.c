@@ -225,8 +225,8 @@ int php_validate_int(PHP_VALIDATE_PARAM_DECL) /* {{{ */
 	}
 
 	if (Z_TYPE_P(value) == IS_LONG &&
-		Z_LVAL_P(value) > Z_LVAL_P(min) &&
-		Z_LVAL_P(value) < Z_LVAL_P(max)) {
+		Z_LVAL_P(value) >= Z_LVAL_P(min) &&
+		Z_LVAL_P(value) <= Z_LVAL_P(max)) {
 		return SUCCESS;
 	} else {
 		convert_to_string(value);
@@ -245,6 +245,7 @@ int php_validate_int(PHP_VALIDATE_PARAM_DECL) /* {{{ */
 	p = Z_STRVAL_P(value);
 	ctx_value = 0;
 
+	/* TODO: Remove HEX support for simplicity */
 	if (*p == '0') {
 		p++; len--;
 		if ((flags & VALIDATE_INT_ALLOW_HEX) && (*p == 'x' || *p == 'X')) {
@@ -268,13 +269,11 @@ int php_validate_int(PHP_VALIDATE_PARAM_DECL) /* {{{ */
 	if (error > 0) {
 		RETURN_VALIDATION_FAILED("Int validation: Invalid int format ");
 	}
-	if (ctx_value < Z_LVAL_P(min)) {
-		RETURN_VALIDATION_FAILED("Int validation: Too small value ");
-	}
-	if (ctx_value > Z_LVAL_P(max)) {
-		RETURN_VALIDATION_FAILED("Int validation: Too large value ");
+	if (ctx_value < Z_LVAL_P(min) || ctx_value > Z_LVAL_P(max)) {
+		RETURN_VALIDATION_FAILED("Int validation: Out of defined range ");
 	}
 	if (flags & VALIDATE_INT_AS_STRING) {
+		/* TODO: Use GMP for large integers */
 		return SUCCESS;
 	}
 	zval_ptr_dtor(value);
@@ -824,7 +823,7 @@ int php_validate_callback(PHP_VALIDATE_PARAM_DECL)
 	}
 	zval_ptr_dtor(&retval);
 	ZVAL_NULL(value);
-	RETURN_VALIDATION_FAILED("Callbak validation: failed");
+	RETURN_VALIDATION_FAILED("Callbak validation: Failed");
 	return FAILURE;
 }
 
